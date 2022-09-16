@@ -1,35 +1,36 @@
 import "./style.scss";
-import { Auth } from "../../common/MALDITOLOGIN/AuthContext";
-import { useState, useEffect,useCallback } from "react";
+import { Auth } from "../../authenticated/AuthContext";
+import { useState, useEffect, useCallback } from "react";
 import { onAuthStateChanged } from "@firebase/auth";
-import { auth } from "../../common/MALDITOLOGIN/firebaseConfig";
+import { auth } from "../../authenticated/firebaseConfig";
+import { CustomerContext } from "../../common/MALDITOLOGIN/Context";
 
 
-
-export function Logon() {
-
+export const Logon = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [user, setUser] = useState({});
     useEffect(() => {
         const AuthCheck = onAuthStateChanged(auth, (user) => {
-          if (user) {
-            setUser(false);
-          }
+            if (user) {
+                setUser(false);
+            }
         });
         return () => AuthCheck();
-      }, []);
+    }, []);
 
-    const testao = useCallback((e:any) => {
+    const handleSubmit = useCallback((e: any) => {
         e.preventDefault();
         Auth(email, password);
     }, [email, password]);
+
+
     return (
 
-
-                <form>
-                    <div>
-                        <h2 className="title">Athena</h2>
+        <div>
+            <form>
+                <div>
+                    <CustomerContext.Provider value={{ onsubmit: handleSubmit }}>
                         <input
                             placeholder="Email"
                             onChange={(e) => setEmail(e.target.value)}
@@ -41,9 +42,11 @@ export function Logon() {
                             type="password"
                             id="senha" />
 
-                        <button onClick={testao}>Logar</button>
-                    </div>
-                </form>
+                        <button onSubmit={handleSubmit}>Logar</button>
+                    </CustomerContext.Provider>
+                </div>
+            </form>
+        </div>
 
     );
 
